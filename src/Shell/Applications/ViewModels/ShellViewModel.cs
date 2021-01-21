@@ -19,9 +19,9 @@ namespace Shell.Applications.ViewModels
         }
 
 
-        public string Title { get { return ApplicationInfo.ProductName; } }
+        public string Title { get; } = ApplicationInfo.ProductName;
 
-        public ICommand ExitCommand { get { return exitCommand; } }
+        public ICommand ExitCommand => exitCommand;
 
 
         public void Show()

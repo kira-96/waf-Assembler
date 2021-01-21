@@ -1,21 +1,22 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.Linq;
-using System.Reflection;
 using System.Waf.Applications;
 using System.Waf.Foundation;
 using System.Windows;
+using System.Windows.Threading;
 using Common.Applications.Services;
 
 namespace Assembler
 {
     /// <summary>
-    /// App.xaml 的交互逻辑
+    /// Interaction logic for App.xaml
     /// </summary>
     public partial class App : Application
     {
-        private readonly IList<string> ModuleAssemblies = new List<string>()
+        private readonly string[] ModuleAssemblies = new []
         {
             "Shell.dll",
             "SimplePlugin.dll",
@@ -28,6 +29,9 @@ namespace Assembler
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
+
+            DispatcherUnhandledException += App_DispatcherUnhandledException;
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 
             catalog = new AggregateCatalog();
             // Add the WpfApplicationFramework assembly to the catalog
@@ -62,6 +66,20 @@ namespace Assembler
             catalog.Dispose();
 
             base.OnExit(e);
+        }
+
+        private void App_DispatcherUnhandledException(object s, DispatcherUnhandledExceptionEventArgs e)
+        {
+            e.Handled = true;
+
+            MessageBox.Show(e.Exception.Message, e.Exception.Source);
+        }
+
+        private void CurrentDomain_UnhandledException(object s, UnhandledExceptionEventArgs e)
+        {
+            Exception exception = e.ExceptionObject as Exception;
+
+            MessageBox.Show(exception.Message, exception.Source);
         }
     }
 }
